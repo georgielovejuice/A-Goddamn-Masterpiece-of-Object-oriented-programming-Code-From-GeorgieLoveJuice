@@ -1,0 +1,25 @@
+@startuml
+participant Student
+participant School
+participant Enrollment
+participant Subject
+
+Student -> School: calc_avg_grade(student_id)
+School -> School: search_subject_that_student_enrolled(student_id)
+
+alt Student has enrolled subjects
+    loop For each subject
+        School -> Enrollment: search_enrollment_subject_student(subject, student)
+        Enrollment -> School: Return grade
+
+        School -> Subject: search_subject_by_id(subject_id)
+        Subject -> School: Return credit
+    end
+
+    School -> School: Calculate GPA \n (sum(grade * credit) / total credits)
+    School -> Student: Return GPA result
+else No enrolled subjects
+    School -> Student: Return message "No enrolled subjects"
+end
+
+@enduml
