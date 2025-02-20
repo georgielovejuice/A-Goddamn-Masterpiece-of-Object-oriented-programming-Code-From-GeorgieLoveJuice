@@ -1,0 +1,144 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+actor Member as member
+actor Librarian as librarian
+actor Administrator as admin
+
+admin ---|> librarian : "Has Librarian Permissions"
+admin --|> member : "Has Member Permissions"
+
+rectangle "Library Management System" {
+    together {
+        ' User Management
+        usecase (User Authentication) as userAuthentication
+        usecase (User Registration) as userRegistration
+        usecase (View and Update Profile) as viewAndUpdateProfile
+        usecase (Check borrowing history and fines) as check
+        usecase (Confirm Registration) as confirm
+
+        userRegistration .up.> userAuthentication: <<extend>>
+        confirm ..> userRegistration: <<include>>
+        librarian --- userAuthentication
+        member --- userAuthentication
+        admin --- confirm
+
+        member -- viewAndUpdateProfile
+        librarian -- viewAndUpdateProfile
+        librarian -- check
+    }
+    together {
+        ' Book Management
+        usecase "Search Book" as searchBook
+        usecase "Borrow Book" as borrowBook
+        usecase "Return Book" as returnBook
+        usecase "Manage Book Records" as manageBook
+    
+        librarian -- manageBook
+        librarian -- searchBook
+        
+        member -- searchBook
+        member -- borrowBook
+        member -- returnBook
+
+        usecase "Add Book" as addBook
+        usecase "Remove Book" as removeBook
+        usecase "Update Book" as updateBook
+        
+        manageBook .down.> addBook: <<include>>
+        manageBook .down.> removeBook: <<include>>
+        manageBook .down.> updateBook: <<include>>
+
+        usecase "View Book Details" as viewDetails
+        usecase "Categorization & Tagging" as categorizeTag
+        usecase "Availability Tracking" as availabilityTrack
+
+        searchBook .down.> viewDetails : <<include>>
+        searchBook .down.> availabilityTrack : <<include>>
+
+        librarian -- availabilityTrack
+        librarian -- categorizeTag
+
+
+        note right of viewDetails
+            Includes:
+                - Title
+                - Author
+                - ISBN
+                - Category
+                - Publisher
+                - Publication Year
+                - Location
+        end note
+
+        note right of availabilityTrack
+            Monitor book status:
+                - Borrowed
+                - Reserved
+                - In Stock
+        end note
+    }
+    together {
+        ' Borrowing and Returning
+        usecase "Transaction Handling" as transactionHandling
+        usecase "Calculate Fines" as calculateFines
+
+        borrowBook .down.> transactionHandling : <<include>>
+        returnBook .down.> transactionHandling : <<include>>
+        transactionHandling .down.> calculateFines : <<extend>>
+
+        usecase "Reserve Book" as reserveBook
+        availabilityTrack <.up. reserveBook: <<include checks availability>>
+
+        usecase "Renew Borrowing" as renewBorrowing
+        renewBorrowing .up.> borrowBook : <<extends borrowing period>>
+        member -- reserveBook
+
+        librarian -- transactionHandling
+        librarian -- calculateFines
+    }
+    together {
+        'Search and Discovery
+        usecase "Filter search by availability, publication year, or location" as searchFilter
+        usecase "Suggest books based on borrowing history or interests" as recommendBooks
+
+        searchBook .down.> searchFilter : <<include>>
+        searchBook .down.> recommendBooks : <<include>>
+    }  
+    together{
+        'Reports & Analytics
+        usecase "Generate reports on overdue books, fines, user activity, and inventory" as generateReports
+        usecase "Analyze borrowing trends, popular genres, and peak activity periods" as usageAnalytics
+        usecase "Visualize data through graphs and charts" as customizableDashboards
+
+        generateReports .down.> usageAnalytics : <<include>>
+        usageAnalytics .down.> customizableDashboards : <<include>>
+
+        admin -- generateReports
+    }
+    together{
+        'Notifications
+        usecase "Notifications" as notifications
+        usecase "Event Notifications" as eventNotifications
+
+
+        borrowBook ..> notifications : <<include>>
+        returnBook ..> notifications : <<extend>>
+        availabilityTrack ..> notifications : <<extend>> 
+
+        admin -- notifications
+        admin -- eventNotifications
+        member <-- notifications
+        member <-- eventNotifications
+    }
+    together{
+        'Integration
+        usecase "Third-party API Integration" as apiIntegration
+        usecase "Barcode & RFID Support" as barcodeRFID
+
+        admin -- apiIntegration
+        librarian -- barcodeRFID
+    }
+}
+@enduml
