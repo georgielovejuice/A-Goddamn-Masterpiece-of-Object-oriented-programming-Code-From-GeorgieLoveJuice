@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page! EIEI</title>
+    <link rel="stylesheet" href="/static/welcome.css">
+</head>
+<body>
+    <div class="ui-sound" style="pointer-events: auto; opacity: 1;"> 
+        <button class="ui ui-sound can-transition sound-off" id="sound">
+            <div class="sound-icons">
+              <img class="sound-on" src="static/icon/SoundOn.png" alt="On" style="display: none;">
+              <img class="sound-off" src="static/icon/SoundOff.png" alt="Sound Off">
+            </div>
+        </button>
+    </div>
+    <div class="ui-enter-main" style="pointer-events: auto; opacity: 1;">
+        <h1>Welcome, To Chatbot</h1>
+        <a href="/main"> 
+            <button>Go to Main Page</button>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let isSoundOn = false;
+            let soundBtn = document.getElementById("sound");
+            let soundOnIcon = soundBtn.querySelector(".sound-on");
+            let soundOffIcon = soundBtn.querySelector(".sound-off");
+            let audio = new Audio("static/music/background.mp3");
+            audio.loop = true; // Keeps looping the background music
+
+            soundBtn.addEventListener("click", function () {
+                isSoundOn = !isSoundOn;
+
+                if (isSoundOn) {
+                    soundOnIcon.style.display = "block";
+                    soundOffIcon.style.display = "none";
+                    audio.play();
+                } else {
+                    soundOnIcon.style.display = "none";
+                    soundOffIcon.style.display = "block";
+                    audio.pause();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
